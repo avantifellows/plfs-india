@@ -1,0 +1,21 @@
+code,description
+11,Worked in household enterprise (self-employed) as own account worker
+12,Worked in household enterprise (self-employed) as employer
+21,Worked as helper in household enterprise (unpaid family worker)
+31,Worked as regular salaried/wage employee
+41,Worked as casual wage labour: in public works
+42,Worked as casual wage labour: in MGNREG public works (CWS only)
+51,Worked as casual wage labour: in other types of work
+61,Did not work though there was work in HH enterprise (CWS only)
+62,Did not work due to sickness though there was work (CWS only)
+71,Did not work due to other reasons though there was work (CWS only)
+72,Did not work but was seeking work (CWS only)
+81,Did not work but was seeking and/or available for work
+82,Did not work but was available for work (CWS only)
+91,Attended educational institutions
+92,Attended domestic duties only
+93,Attended domestic duties and engaged in free collection / sewing / weaving for HH use
+94,"Rentiers, pensioners, remittance recipients, etc."
+95,Not able to work due to disability
+97,"Others (including begging, prostitution, etc.)"
+98,Children of age 0-4 years (CWS-specific extension; varies)

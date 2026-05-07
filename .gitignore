@@ -1,0 +1,33 @@
+# Unit-level data files — gated behind microdata.gov.in login,
+# can't be redistributed. See README §Step 0 to fetch.
+raw/data/*.txt
+raw/data/*.TXT
+raw/data/*.zip
+
+# Built outputs from raw data — regenerable via scripts/parse_plfs_data.py
+clean/hhv1.csv
+clean/hhrv.csv
+clean/perv1.csv
+clean/perrv.csv
+
+# Local scratch / OS detritus
+.DS_Store
+*.html
+catalog_page.html
+getmicro.html
+__pycache__/
+*.pyc
+
+# Cached PDF text (regenerable from PDF via pdftotext)
+raw/docs/*.txt
+raw/external/*.txt
+
+# Pre-existing per-release folders in this working dir (other releases — exclude
+# until we explicitly decide to bring them in. Calendar-year releases use a
+# different layout from the annual release this repo documents.)
+PLFS 2022/
+PLFS 2023/
+PLFS_2025/
+
+# Local Claude harness state — not for the repo
+.claude/

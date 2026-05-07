@@ -1,0 +1,10 @@
+code,description
+1,Only PF/pension
+2,Only gratuity
+3,Only health care/maternity benefits
+4,Only PF/pension and gratuity
+5,Only PF/pension and health care/maternity benefits
+6,Only gratuity and health care/maternity benefits
+7,PF/pension AND gratuity AND health care/maternity benefits
+8,Not eligible for any of the above
+9,Not known

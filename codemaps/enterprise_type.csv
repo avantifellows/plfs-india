@@ -1,0 +1,13 @@
+code,description
+01,Proprietary - male
+02,Proprietary - female
+03,Partnership with members from same household
+04,Partnership with members from different household
+05,Government/local body
+06,Public Sector Enterprises
+07,Autonomous Bodies
+08,Public/Private limited company
+10,Co-operative societies
+11,Trust/other non-profit institutions
+12,"Employer's households (private households employing maid, watchman, cook, etc.)"
+19,Others

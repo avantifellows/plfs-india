@@ -1,0 +1,23 @@
+code,description
+01,Aerospace and aviation
+02,"Agriculture, non-crop based agriculture, food processing"
+03,"Allied manufacturing - gems and jewellery, leather, rubber, furniture, fittings, printing"
+04,Artisan/craftsman/handicraft/creative arts and cottage based production
+05,Automotive
+06,Beauty and wellness
+07,"Chemical engineering, hydrocarbons, chemicals, petrochemicals"
+08,"Civil engineering - construction, plumbing, paints and coatings"
+09,"Electrical, power and electronics"
+10,Healthcare and life sciences
+11,Hospitality and tourism
+12,"Iron and steel, mining, earthmoving and infra building"
+13,IT-ITeS
+14,Logistics
+15,"Mechanical engineering - capital goods, strategic manufacturing"
+16,"Media - journalism, mass communication and entertainment"
+17,Office and business related work
+18,Security
+19,Telecom
+20,"Textiles and handlooms, apparels"
+21,"Childcare, nutrition, pre-school and crèche"
+99,Others

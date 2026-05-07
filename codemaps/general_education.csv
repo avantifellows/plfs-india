@@ -1,0 +1,13 @@
+code,description
+01,Not literate
+02,Literate without formal schooling: EGS/NFEC/AEC
+03,Literate without formal schooling: TLC
+04,Literate without formal schooling: others
+05,Literate: below primary
+06,Literate: primary
+07,Literate: middle
+08,Literate: secondary
+10,Literate: higher secondary
+11,Literate: diploma/certificate course
+12,Literate: graduate
+13,Literate: postgraduate and above

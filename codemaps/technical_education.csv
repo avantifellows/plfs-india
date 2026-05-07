@@ -1,0 +1,17 @@
+code,description
+01,No technical education
+02,Technical degree in agriculture
+03,Technical degree in engineering/technology
+04,Technical degree in medicine
+05,Technical degree in crafts
+06,Technical degree in other subjects
+07,Diploma/certificate (below graduate) in agriculture
+08,Diploma/certificate (below graduate) in engineering/technology
+09,Diploma/certificate (below graduate) in medicine
+10,Diploma/certificate (below graduate) in crafts
+11,Diploma/certificate (below graduate) in other subjects
+12,Diploma/certificate (graduate+) in agriculture
+13,Diploma/certificate (graduate+) in engineering/technology
+14,Diploma/certificate (graduate+) in medicine
+15,Diploma/certificate (graduate+) in crafts
+16,Diploma/certificate (graduate+) in other subjects
