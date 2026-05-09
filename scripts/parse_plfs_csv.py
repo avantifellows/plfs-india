@@ -45,14 +45,23 @@ def parse_file(release_name: str, file_cfg: dict):
     out = cfg['out_dir'] / f"{file_cfg['key']}.csv"
     out.parent.mkdir(parents=True, exist_ok=True)
 
+    # tsv input has no header; csv input has 1 header row
+    is_tsv = cfg.get('input_kind') == 'tsv'
+    delim = '\t' if is_tsv else ','
+
     n = 0
     n_short = 0
     n_long = 0
     with src.open(encoding='latin-1', newline='') as fin, out.open('w', newline='', encoding='utf-8') as fout:
-        reader = csv.reader(fin)
+        reader = csv.reader(fin, delimiter=delim)
         writer = csv.writer(fout)
-        src_headers = next(reader)
-        n_src_cols = len(src_headers)
+        if is_tsv:
+            # TSV (Nesstar export) has no header row — just data
+            src_headers = field_names  # we use the layout-derived names
+            n_src_cols = len(field_names)
+        else:
+            src_headers = next(reader)
+            n_src_cols = len(src_headers)
 
         if n_src_cols < n_expected:
             print(f"  WARN {file_cfg['key']}: source has {n_src_cols} cols, layout expects {n_expected}")
@@ -97,13 +106,13 @@ def main():
     args = ap.parse_args()
 
     targets = args.releases or [
-        r for r, cfg in RELEASES.items() if cfg.get('input_kind') == 'csv'
+        r for r, cfg in RELEASES.items() if cfg.get('input_kind') in ('csv', 'tsv')
     ]
     grand = 0
     for r in targets:
         cfg = RELEASES[r]
-        if cfg.get('input_kind') != 'csv':
-            print(f"  SKIP {r}: not a csv-input release")
+        if cfg.get('input_kind') not in ('csv', 'tsv'):
+            print(f"  SKIP {r}: not a csv/tsv-input release")
             continue
         print(f"\n=== {r} — {cfg['label']} ===")
         for fc in cfg['files']:

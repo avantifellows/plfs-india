@@ -56,3 +56,18 @@ PLFS_2025/
 
 # Local Claude harness state — not for the repo
 .claude/
+
+# CSVs from new releases (regenerable via parse_plfs_csv.py)
+clean/annual_2019_20/*.csv
+clean/annual_2020_21/*.csv
+clean/calendar_2021/*.csv
+clean/annual_2021_22/*.csv
+clean/annual_2022_23/*.csv
+clean/calendar_2023/*.csv
+clean/annual_2023_24/*.csv
+
+# Nesstar-extracted TSVs (intermediate; regenerable via Nesstar Explorer)
+raw/_extracted_from_nesstar/
+
+# Local cache
+/tmp/plfs_*

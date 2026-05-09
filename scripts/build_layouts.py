@@ -225,7 +225,7 @@ def build_release(release_name: str):
     wb = openpyxl.load_workbook(cfg["xlsx"], data_only=True)
 
     summary = []
-    is_csv_input = cfg.get("input_kind") == "csv"
+    is_csv_input = cfg.get("input_kind") in ("csv", "tsv")
     for fc in cfg["files"]:
         key = fc["key"]
         if is_csv_input:

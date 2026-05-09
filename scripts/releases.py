@@ -56,6 +56,104 @@ RELEASES = {
         ],
     },
 
+    # ---- Annual Jul 2019 – Jun 2020 (catalog 217) ----
+    # Pre-COVID + first-quarter-of-COVID lockdown. TSV input (Nesstar export).
+    # HH_FV and HH_RV share one 32-field schema (rows 4-36). Total 4 files.
+    "annual_2019_20": {
+        "label": "PLFS Annual, July 2019 – June 2020 (catalog 217)",
+        "input_kind": "tsv",
+        "xlsx": ROOT / "raw" / "docs_annual_2019_20" / "Data_Layout_PLFS_2019-20.xlsx",
+        "data_dir": ROOT / "raw" / "_extracted_from_nesstar" / "DDI-IND-CSO-PLFS-2019-2020",
+        "out_dir": ROOT / "clean" / "annual_2019_20",
+        "layout_dir": ROOT / "clean" / "annual_2019_20" / "layout",
+        "files": [
+            {"key": "hhv1",  "section": (4, 36),    "byte_total": 86,  "csv_name": "HHFV_2019-20.txt"},
+            {"key": "hhrv",  "section": (4, 36),    "byte_total": 86,  "csv_name": "HHRV_2019-20.txt"},
+            {"key": "perv1", "section": (40, 169),  "byte_total": 319, "csv_name": "PERFV_2019-20.txt"},
+            {"key": "perrv", "section": (173, 279), "byte_total": 275, "csv_name": "PERRV_2019-20.txt"},
+        ],
+    },
+
+    # ---- Annual Jul 2020 – Jun 2021 (catalog 206) ----
+    # COVID year. New separate HHV1 (37 fields) / HHRV (32) split.
+    "annual_2020_21": {
+        "label": "PLFS Annual, July 2020 – June 2021 (catalog 206)",
+        "input_kind": "tsv",
+        "xlsx": ROOT / "raw" / "docs_annual_2020_21" / "Data_Layout_PLFS_2020-21.xlsx",
+        "data_dir": ROOT / "raw" / "_extracted_from_nesstar" / "DDI-IND-CSO-PLFS-2020-21",
+        "out_dir": ROOT / "clean" / "annual_2020_21",
+        "layout_dir": ROOT / "clean" / "annual_2020_21" / "layout",
+        "files": [
+            {"key": "hhv1",  "section": (4, 45),    "byte_total": 126, "csv_name": "hhv1.txt"},
+            {"key": "hhrv",  "section": (46, 82),   "byte_total":  86, "csv_name": "hhrv.txt"},
+            {"key": "perv1", "section": (83, 246),  "byte_total": 362, "csv_name": "perv1.txt"},
+            {"key": "perrv", "section": (247, 350), "byte_total": 275, "csv_name": "perrv.txt"},
+        ],
+    },
+
+    # ---- Calendar Year 2021 (catalog 209) ----
+    # First calendar release. Smaller schema — only Blocks 1, 4, 6 (no usual-status).
+    # Annotated as such in the layout XLSX.
+    "calendar_2021": {
+        "label": "PLFS Calendar Year 2021, January – December 2021 (catalog 209)",
+        "input_kind": "tsv",
+        "xlsx": ROOT / "raw" / "docs_calendar_2021" / "Data_Layout_PLFS_Calendar_2021.xlsx",
+        "data_dir": ROOT / "raw" / "_extracted_from_nesstar" / "DDI-IND-CSO-PLFS-2021-21",
+        "out_dir": ROOT / "clean" / "calendar_2021",
+        "layout_dir": ROOT / "clean" / "calendar_2021" / "layout",
+        "files": [
+            {"key": "chhv1",  "section": (4, 47),  "byte_total": 128, "csv_name": "hhv1.txt"},
+            {"key": "cperv1", "section": (48, 74), "byte_total":  71, "csv_name": "cperv1.txt"},
+        ],
+    },
+
+    # ---- Annual Jul 2021 – Jun 2022 (catalog 214) ----
+    "annual_2021_22": {
+        "label": "PLFS Annual, July 2021 – June 2022 (catalog 214)",
+        "input_kind": "tsv",
+        "xlsx": ROOT / "raw" / "docs_annual_2021_22" / "Data_Layout_PLFS_2021-22.xlsx",
+        "data_dir": ROOT / "raw" / "_extracted_from_nesstar" / "DDI-IND-CSO-PLFS-2021-22",
+        "out_dir": ROOT / "clean" / "annual_2021_22",
+        "layout_dir": ROOT / "clean" / "annual_2021_22" / "layout",
+        "files": [
+            {"key": "hhv1",  "section": (4, 45),    "byte_total": 126, "csv_name": "hhv1.txt"},
+            {"key": "hhrv",  "section": (46, 82),   "byte_total":  86, "csv_name": "hhrv.txt"},
+            {"key": "perv1", "section": (83, 230),  "byte_total": 333, "csv_name": "perv1.txt"},
+            {"key": "perrv", "section": (231, 334), "byte_total": 275, "csv_name": "perrv.txt"},
+        ],
+    },
+
+    # ---- Annual Jul 2022 – Jun 2023 (catalog 210) ----
+    "annual_2022_23": {
+        "label": "PLFS Annual, July 2022 – June 2023 (catalog 210)",
+        "input_kind": "tsv",
+        "xlsx": ROOT / "raw" / "docs_annual_2022_23" / "Data_Layout_PLFS_2022-23.xlsx",
+        "data_dir": ROOT / "raw" / "_extracted_from_nesstar" / "DDI-IND-CSO-PLFS-2022-23",
+        "out_dir": ROOT / "clean" / "annual_2022_23",
+        "layout_dir": ROOT / "clean" / "annual_2022_23" / "layout",
+        "files": [
+            {"key": "hhv1",  "section": (4, 45),    "byte_total": 126, "csv_name": "hhv1.txt"},
+            {"key": "hhrv",  "section": (46, 82),   "byte_total":  86, "csv_name": "hhrv.txt"},
+            {"key": "perv1", "section": (83, 226),  "byte_total": 330, "csv_name": "perv1.txt"},
+            {"key": "perrv", "section": (227, 330), "byte_total": 275, "csv_name": "perrv.txt"},
+        ],
+    },
+
+    # ---- Calendar Year 2023 (catalog 208 / "203" folder name) ----
+    # Same schema as CY2024 = same as CY2022.
+    "calendar_2023": {
+        "label": "PLFS Calendar Year 2023, January – December 2023 (catalog 208)",
+        "input_kind": "tsv",
+        "xlsx": ROOT / "raw" / "docs_calendar_2023" / "Data_LayoutPLFS_Calendar_2023.xlsx",
+        "data_dir": ROOT / "raw" / "_extracted_from_nesstar" / "DDI-IND-CSO-PLFS-2023-23",
+        "out_dir": ROOT / "clean" / "calendar_2023",
+        "layout_dir": ROOT / "clean" / "calendar_2023" / "layout",
+        "files": [
+            {"key": "chhv1",  "section": (4, 45),   "byte_total": 129, "csv_name": "CHHV1.txt"},
+            {"key": "cperv1", "section": (46, 297), "byte_total": 333, "csv_name": "cperv1.txt"},
+        ],
+    },
+
     # ---- Calendar Year 2022 (catalog 211) ----
     # Same schema as CY2024. CSV input (txt2csv pre-converted).
     "calendar_2022": {
@@ -73,17 +171,16 @@ RELEASES = {
 
     "annual_2023_24": {
         "label": "PLFS Annual, July 2023 – June 2024 (catalog 213)",
-        "input_kind": "txt",
+        "input_kind": "tsv",   # switched from txt fixed-width — using Nesstar-extracted TSV
         "xlsx": ROOT / "raw" / "docs" / "Data_Layout_PLFS_2023-24.xlsx",
-        "data_dir": ROOT / "raw" / "data",
+        "data_dir": ROOT / "raw" / "_extracted_from_nesstar" / "DDI-IND-CSO-PLFS-2023-24",
         "out_dir": ROOT / "clean" / "annual_2023_24",
         "layout_dir": ROOT / "clean" / "annual_2023_24" / "layout",
-        "self_contained": False,
         "files": [
-            {"key": "hhv1",  "section": (2, 42),    "fieldname_sheet": "hhv1",  "fieldname_col": 6, "srl_join": True,  "byte_total": 126, "data_filename": "HHV1.txt"},
-            {"key": "hhrv",  "section": (44, 79),   "fieldname_sheet": "hhrv",  "fieldname_col": 6, "srl_join": True,  "byte_total":  86, "data_filename": "HHRV.txt"},
-            {"key": "perv1", "section": (81, 223),  "fieldname_sheet": "perv1", "fieldname_col": 6, "srl_join": True,  "byte_total": 330, "data_filename": "PERV1.txt"},
-            {"key": "perrv", "section": (225, 330), "fieldname_sheet": "perrv", "fieldname_col": 6, "srl_join": True,  "byte_total": 275, "data_filename": "PERRV.txt"},
+            {"key": "hhv1",  "section": (2, 42),    "byte_total": 126, "csv_name": "hhv1.txt"},
+            {"key": "hhrv",  "section": (44, 79),   "byte_total":  86, "csv_name": "hhrv.txt"},
+            {"key": "perv1", "section": (81, 223),  "byte_total": 330, "csv_name": "perv1.txt"},
+            {"key": "perrv", "section": (225, 330), "byte_total": 275, "csv_name": "perrv.txt"},
         ],
     },
     "calendar_2024": {

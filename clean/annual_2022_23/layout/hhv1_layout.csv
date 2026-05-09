@@ -1,7 +1,7 @@
 srl,field_name,name,block,item,length,byte_start,byte_end,remarks
-1,file_id,File Identification,,,4,1,4,FVH7
+1,file_id,File Identification,,,4,1,4,FVH6
 2,sch,Schdule,1,2,3,5,7,104
-3,qtr,Quarter,,,2,8,9,Q1 to Q4
+3,qtr,Quarter,,,2,8,9,Q5 to Q8
 4,visit,Visit,,,2,10,11,V1' for first visit
 5,sec,Sector,1,3,1,12,12,
 6,st,State/Ut Code,,1,2,13,14,
@@ -35,4 +35,4 @@ srl,field_name,name,block,item,length,byte_start,byte_end,remarks
 34,nss,Ns count for sector x stratum x substratum x sub-sample,Generated,,3,110,112,NSS
 35,nsc,Ns count for sector x stratum x substratum,Generated,,3,113,115,NSC
 36,mult,Sub-sample wise Multiplier,Generated,,10,116,125,MULT
-37,no_qtr,Count of contributing State x Sector x Stratum x SubStratum in 4 Quarters,Generated,,1,126,126,No_Qtr
+37,no_qtr,Occurence of State x Sector x Stratum x SubStratum in 4 Quarters,Generated,,1,126,126,No_Qtr
