@@ -1,0 +1,12 @@
+release_id,label,format,year_label,period_start,period_end,catalog_id,catalog_url,weight_rule,input_kind,n_files,file_keys
+annual_2018_19,"PLFS Annual, July 2018 – June 2019",annual,2018-19,2018-07,2019-06,216,https://microdata.gov.in/nada43/index.php/catalog/216,combined,csv,4,hhv1|hhrv|perv1|perrv
+annual_2019_20,"PLFS Annual, July 2019 – June 2020",annual,2019-20,2019-07,2020-06,217,https://microdata.gov.in/nada43/index.php/catalog/217,combined,tsv,4,hhv1|hhrv|perv1|perrv
+annual_2020_21,"PLFS Annual, July 2020 – June 2021",annual,2020-21,2020-07,2021-06,206,https://microdata.gov.in/nada43/index.php/catalog/206,combined,tsv,4,hhv1|hhrv|perv1|perrv
+calendar_2021,PLFS Calendar Year 2021,calendar,CY2021,2021-01,2021-12,209,https://microdata.gov.in/nada43/index.php/catalog/209,limited,tsv,2,chhv1|cperv1
+annual_2021_22,"PLFS Annual, July 2021 – June 2022",annual,2021-22,2021-07,2022-06,214,https://microdata.gov.in/nada43/index.php/catalog/214,combined,tsv,4,hhv1|hhrv|perv1|perrv
+calendar_2022,PLFS Calendar Year 2022,calendar,CY2022,2022-01,2022-12,211,https://microdata.gov.in/nada43/index.php/catalog/211,combined,csv,2,chhv1|cperv1
+annual_2022_23,"PLFS Annual, July 2022 – June 2023",annual,2022-23,2022-07,2023-06,210,https://microdata.gov.in/nada43/index.php/catalog/210,combined,tsv,4,hhv1|hhrv|perv1|perrv
+calendar_2023,PLFS Calendar Year 2023,calendar,CY2023,2023-01,2023-12,208,https://microdata.gov.in/nada43/index.php/catalog/208,half_yearly,tsv,2,chhv1|cperv1
+annual_2023_24,"PLFS Annual, July 2023 – June 2024",annual,2023-24,2023-07,2024-06,213,https://microdata.gov.in/nada43/index.php/catalog/213,combined,tsv,4,hhv1|hhrv|perv1|perrv
+calendar_2024,PLFS Calendar Year 2024,calendar,CY2024,2024-01,2024-12,254,https://microdata.gov.in/nada43/index.php/catalog/254,combined,txt,2,chhv1|cperv1
+calendar_2025,PLFS Calendar Year 2025,calendar,CY2025,2025-01,2025-12,284,https://microdata.gov.in/nada43/index.php/catalog/284,simple,txt,2,chhv1|cperv1
