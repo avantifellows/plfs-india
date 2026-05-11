@@ -1,12 +1,12 @@
 # PLFS → BigQuery — preview for review
 
-**Hi Pritam.** This directory is the proposal for what we'd land in BigQuery,
-generated as plain JSON files so you can review the schema design + sample
-data without touching GCP. Nothing has been created on BQ yet.
+This directory is the proposal for what we'd land in BigQuery, generated
+as plain JSON files so the schema design + sample data can be reviewed
+without touching GCP. Nothing has been created on BQ yet.
 
 This README has the context — what PLFS is, what we use it for, how the data
-flows, and the technical decisions we'd like a second pair of eyes on.
-Skip to [the schema](#6-the-schema) if you just want to look at columns.
+flows, and the technical decisions worth a second pair of eyes.
+Skip to [the schema](#6-the-schema) for the column list.
 
 ---
 
@@ -262,7 +262,7 @@ Each table has `code` + `description` columns (a few have richer schemas —
    - **Per-release tables**: cleaner per-release schemas, no NULL columns.
      But every cross-year query needs UNION ALL.
 
-   This is the most likely call to be reversed if you disagree.
+   This is the most likely call to be reversed if the review disagrees.
 
 2. **`weight_annual` computed at load time, not query time**
 
@@ -318,19 +318,19 @@ Recommended review order (~30 min):
 5. **`schemas/households.schema.json`** — narrower than persons; check that
    the join keys to persons are clear
 
-## 9. Open questions for you
+## 9. Open questions for review
 
-- **Dataset name**: I've used `plfs` in the DDL. Should this live in a
-  specific GCP project (probably `avantifellows`)? Different name?
-- **Access control**: read access for analysts (Akshay + research team) is
-  one set of permissions; future Streamlit/dashboard frontends would need
-  service-account auth. Worth thinking about now.
+- **Dataset name**: the DDL uses `plfs`. Should this live in a specific GCP
+  project (probably `avantifellows`)? Different name?
+- **Access control**: read access for the research team is one set of
+  permissions; future Streamlit/dashboard frontends would need
+  service-account auth. Worth deciding upfront.
 - **Update cadence**: PLFS publishes new releases every 6-9 months (next:
   Annual Jul24-Jun25 expected Q2 2026). Should `scripts/load_bq.py` be
   wired into a Cloud Run job triggered on `clean/releases.csv` changes,
   or kept manual for now?
-- **Cost monitoring**: should we set a budget alert on the project? At
-  current usage it'll be $0, but worth a guardrail.
+- **Cost monitoring**: worth setting a budget alert on the project? At
+  current usage it'll be $0, but a guardrail is cheap.
 
 ## 10. How to go live (after sign-off)
 
@@ -355,8 +355,3 @@ GROUP BY release_id
 ORDER BY release_id'
 # Expected: 1.08B - 1.22B per release (validates weight calibration)
 ```
-
-Ping me on Slack with the go-ahead — happy to walk through any part of
-this with you.
-
-— Akshay
