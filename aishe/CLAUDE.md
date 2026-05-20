@@ -1,0 +1,65 @@
+# CLAUDE.md — aishe
+
+Source-level orientation for the AISHE pipeline. Read the top-level
+`../CLAUDE.md` for cross-cutting repo conventions first.
+
+## What this source is
+
+AISHE (All India Survey on Higher Education, MoE) out-turn data. Upstream is one
+Excel **Final Report** workbook per academic year (`raw/*.xlsx`, gitignored).
+The workbooks need real parsing, so this folder follows the `plfs/` (heavy
+parse) shape for cleaning but the `nirf/` (parquet → GCS → BQ) shape for
+loading.
+
+## Layout
+
+```
+aishe/
+├── scripts/
+│   ├── sources.py            # config + Table registry (single source of truth)
+│   ├── build_programme_map.py# 34a programme names -> discipline (heuristic) -> codemaps/*.csv
+│   ├── clean_aishe.py        # parse raw/*.xlsx -> clean/*.parquet (all 7 tables)
+│   ├── upload_to_gcs.py      # clean/*.parquet -> gs://avantifellows-external-data/aishe/
+│   └── load_bq.py            # GCS -> avantifellows.external_data_sources.aishe_*
+├── schemas/                  # one YAML per BQ table
+├── codemaps/                 # programme_to_discipline.csv (committed, auditable)
+├── raw/                      # source workbooks (gitignored)
+└── clean/                    # parsed parquet (gitignored)
+```
+
+Add or change tables in `scripts/sources.py` (the `TABLES` registry) — every
+other script iterates over it.
+
+## Parsing gotchas (carried over from the original extractors)
+
+- **Sheet names vary by year.** Match on the space-stripped, lowercased name
+  (`12UGDisc` sometimes has a trailing space; `_sheet()` in clean_aishe.py
+  handles this).
+- **Column layout shifts across years.** 2019-20/2020-21 UG-discipline sheets
+  put Discipline in column 0; 2021-22 added an S.No. column, shifting it to
+  column 1. `_parse_discipline_series()` auto-detects by locating the row whose
+  cell equals `"Discipline"` exactly.
+- **Discipline totals only.** Sub-discipline (subject) rows are skipped; a
+  discipline total row has an empty Subject column or a name ending in "Total".
+- **Two incompatible taxonomies.** Table 35 classifies by *subject* (rolled into
+  AISHE disciplines); Table 34a classifies by *degree programme*. The
+  programme→discipline codemap maps by degree name and cannot recover
+  subject-based disciplines (Indian Language, Social Science, …). See README.
+- **Social categories overlap.** All Categories ⊇ SC/ST/OBC/PwD/Muslim/EWS —
+  never sum across `social_category`.
+
+## Refreshing for a new AISHE release
+
+1. Download the new Final Report `.xlsx` into `raw/` (canonical filename).
+2. If the programme list changed, re-run `build_programme_map.py` and review the
+   diff in `codemaps/programme_to_discipline.csv`.
+3. `clean_aishe.py` → `upload_to_gcs.py` → `load_bq.py`. Loads are
+   `WRITE_TRUNCATE` (idempotent). To carry multiple AISHE years, the single-year
+   out-turn tables already key on `aishe_year`; append rather than truncate by
+   adjusting the load disposition.
+
+## Don't
+
+- Don't commit anything under `raw/` or `clean/` — they're gitignored data.
+- Don't sum across `social_category` (overlapping) or treat the discipline
+  rollup / extrapolation as published AISHE figures (both are derived).

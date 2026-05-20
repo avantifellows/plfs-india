@@ -1,0 +1,6 @@
+# AISHE source + derived data — never in git. Staged to GCS instead.
+# Raw Final Report workbooks (re-downloadable from aishe.gov.in; see README).
+raw/*.xlsx
+raw/*.XLSX
+# Parsed parquet (regenerable via scripts/clean_aishe.py).
+clean/*.parquet
