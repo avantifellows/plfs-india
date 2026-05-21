@@ -1,0 +1,63 @@
+# nas_fact_national_proficiency
+#
+# NAS 2021 (National Achievement Survey) performance & proficiency, aggregated
+# from state level to NATIONAL using student-count weights, broken out by
+# management and by location, for grades 3 / 5 / 8 / 10. 90 rows: one per
+# (grade, subject, dimension, category).
+#
+# NAS publishes percent-correct and proficiency-band figures at the STATE level
+# only. The national figures here are a student-weighted mean across states,
+# weight = state total_student × the state's share of students in that
+# management/location bucket (from NAS_participation_state.csv).
+#
+# Proficiency is reported as two tails only: "% Proficient and Advance" (top)
+# and "% Basic and Below Basic" (bottom). NAS does not publish the four-band
+# split in this data set.
+#
+# Source CSVs: gs://avantifellows-external-data/nas/raw/csv_data/
+# Source parquet: gs://avantifellows-external-data/nas/clean/national_proficiency.parquet
+# BQ table:    avantifellows.external_data_sources.nas_fact_national_proficiency
+
+description: NAS 2021 national (student-weighted from state) performance & proficiency by grade, subject, and management/location bucket.
+rows: 90
+grain: (grade, subject, dimension, category)
+
+columns:
+  - name: grade
+    type: INTEGER
+    mode: REQUIRED
+    description: 'Class assessed: 3, 5, 8, or 10.'
+
+  - name: subject
+    type: STRING
+    mode: REQUIRED
+    description: >
+      Subject code as published. Grade 3/5: language, math, evs. Grade 8:
+      language, math, sci, sst. Grade 10: eng, mil, math, sci, sst.
+
+  - name: dimension
+    type: STRING
+    mode: REQUIRED
+    description: 'Breakdown dimension: "management" or "location".'
+
+  - name: category
+    type: STRING
+    mode: REQUIRED
+    description: >
+      Bucket within the dimension. management → State Govt, Govt Aided,
+      Private Recognised, Central Govt. location → Rural, Urban.
+
+  - name: pct_correct_mean
+    type: FLOAT
+    mode: NULLABLE
+    description: National student-weighted mean percent-correct score for this bucket.
+
+  - name: pct_proficient_advanced
+    type: FLOAT
+    mode: NULLABLE
+    description: National student-weighted share (%) of students in the Proficient + Advanced band (top tail).
+
+  - name: pct_basic_below_basic
+    type: FLOAT
+    mode: NULLABLE
+    description: National student-weighted share (%) of students in the Basic + Below-Basic band (bottom tail).
