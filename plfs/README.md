@@ -320,6 +320,31 @@ The load script is idempotent (`WRITE_TRUNCATE`), reproducible, and runs in
 ~5-10 minutes for the full 10.5M-row dataset. Re-run whenever a new PLFS
 release lands.
 
+## 12. GCS staging (parquet — BigQuery later, post-approval)
+
+To fit the `external_data_sources` model (raw in GCS → joined parquets → BQ once
+reviewed), [`scripts/upload_to_gcs.py`](scripts/upload_to_gcs.py) stages two
+things under `gs://avantifellows-external-data/plfs/`:
+
+- **`raw/`** — the per-release unit-level microdata (rsync of the local `raw/`
+  tree). PLFS raw is gated behind microdata.gov.in, so there is **no `fetch.py`**;
+  this GCS copy is the regenerable source of record.
+- **`clean/`** — the six joined tables as parquet, built by `load_bq.py --dry-run`
+  (which unions all 11 releases into `/tmp/plfs_bq`), uploaded with source-prefixed
+  names that map 1:1 to the eventual BQ tables: `plfs_fact_persons`,
+  `plfs_fact_households`, `plfs_dim_nco` / `nic` / `geo`, `plfs_releases`.
+
+```bash
+python3 scripts/load_bq.py --dry-run                          # joined parquets → /tmp/plfs_bq
+python3 scripts/upload_to_gcs.py --raw-dir <raw> --parquet-dir /tmp/plfs_bq
+#   --raw-only / --clean-only / --dry-run
+```
+
+The BQ load is deferred to post-approval. When it runs it can use the dataframe
+loader above (point `--dataset external_data_sources`, table names gain the
+`plfs_` prefix) or be switched to load the staged parquets from GCS via
+`load_table_from_uri`.
+
 ## Status
 
 | Release          | Format   | Catalog | Parsed | Sample size |
