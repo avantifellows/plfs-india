@@ -1,12 +1,24 @@
-table: plfs.households
+table: avantifellows.external_data_sources.plfs_fact_households
 description: |
-  Household-level facts unioned across all 11 PLFS releases (~2.5M rows).
-  One row per surveyed household per visit. Join to plfs.persons on hh_id.
+  ── What this table is ───────────────────────────────────────────────────
+  Household-level facts from PLFS (see plfs_fact_persons for the survey
+  background), all 11 releases unioned (~2.5M rows). One row = one surveyed
+  household in one survey visit. Join to plfs_fact_persons on hh_id to attach
+  household socio-economics to each person.
 
-  PLFS does not collect income directly; HCE (Household Consumer
-  Expenditure) is the standard income proxy. The derived mpce column
-  (Monthly Per Capita Consumer Expenditure = hce_tot / hh_size) is what
-  most "low-income household" analyses use.
+  ── Income proxy: why HCE / MPCE instead of income ───────────────────────
+  PLFS does NOT ask households their income (income is hard to measure
+  reliably in survey conditions). Instead it records HCE — Household Consumer
+  Expenditure, i.e. how much the household SPENDS per month — as the standard
+  living-standard / income proxy used across Indian household surveys.
+    • hce_tot = total monthly household spend (₹).
+    • mpce    = Monthly Per-Capita Consumer Expenditure = hce_tot / hh_size,
+                i.e. spend per head. This is the comparable figure across
+                households of different sizes and is what "low-income /
+                first-generation" analyses rank and bucket on.
+
+  Weights work exactly as in plfs_fact_persons: weight_annual = households
+  represented; SUM it for population household counts (NULL for CY2021).
 clustering: [release_id, st]
 columns:
   # ── Release metadata ───────────────────────────────────────────────────
@@ -23,7 +35,7 @@ columns:
 
   # ── Join key + survey design ───────────────────────────────────────────
   - { name: hh_id,          type: STRING, mode: REQUIRED,
-      description: "Stable 16-char SHA1 prefix; same derivation as plfs.persons.hh_id. Joins to plfs.persons." }
+      description: "Stable 16-char SHA1 prefix; same derivation as plfs_fact_persons.hh_id. Joins to plfs_fact_persons." }
   - { name: qtr,            type: STRING, description: "Quarter code." }
   - { name: month,          type: STRING, description: "Month code (CY2025)." }
   - { name: visit,          type: STRING, description: "Visit code." }
@@ -48,8 +60,8 @@ columns:
   - { name: hh_type_label,     type: STRING, description: "Denormalized hh_type label resolved against the correct rural/urban codemap based on sec." }
   - { name: religion,          type: STRING, description: "Religion code." }
   - { name: religion_label,    type: STRING, description: "Denormalized religion label." }
-  - { name: social_grp,        type: STRING, description: "Social group code (SC/ST/OBC/Other)." }
-  - { name: social_grp_label,  type: STRING, description: "Denormalized social group label." }
+  - { name: social_grp,        type: STRING, description: "Social group code — India's official affirmative-action categories: ST (Scheduled Tribe), SC (Scheduled Caste), OBC (Other Backward Class), or Others. Standard equity-cut dimension." }
+  - { name: social_grp_label,  type: STRING, description: "Denormalized social group label (Scheduled Tribe / Scheduled Caste / OBC / Others)." }
 
   # ── HCE (income proxy) ─────────────────────────────────────────────────
   - { name: hce_tot,  type: INT64, description: "Total household monthly consumer expenditure (₹). The PLFS-standard income proxy." }

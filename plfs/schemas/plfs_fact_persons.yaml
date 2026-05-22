@@ -1,13 +1,45 @@
-table: plfs.persons
+table: avantifellows.external_data_sources.plfs_fact_persons
 description: |
-  Person-level facts unioned across all 11 PLFS releases (~10.5M rows).
-  One row per person-record per visit. Filter by release_id for any
-  cross-year analysis; join to plfs.households on hh_id for income proxy
-  and household characteristics.
+  ── What this table is ───────────────────────────────────────────────────
+  Person-level facts from PLFS (Periodic Labour Force Survey) — India's
+  official household survey of employment, run by MoSPI/NSO. It is the
+  source for India's unemployment rate, labour-force participation, wages,
+  etc. All 11 releases (2018-19 → CY2025) are unioned here (~10.5M rows).
+  One row = one surveyed person in one survey visit. Filter by release_id
+  for any cross-year analysis; join to plfs_fact_households on hh_id for the
+  income proxy and household characteristics.
 
-  Labels for the small common enums (sex, sector, marital_status, …) are
-  denormalized inline as *_label columns. Hierarchical lookups (NCO / NIC)
-  live in plfs.dim_nco / plfs.dim_nic.
+  ── PLFS measures employment THREE ways (different reference periods) ─────
+  The same person has three activity-status readings; pick the one your
+  question needs and don't mix them:
+    • Usual PRINCIPAL activity status (PAS, cols *_pas) — the activity the
+      person spent the MOST of the last 365 days on. Their "main" status
+      over the year. This is what most longitudinal analyses use.
+    • Usual SUBSIDIARY activity status (SAS, cols *_sas) — a SECONDARY
+      activity pursued for ≥30 days in the year. Only populated if any.
+    • CURRENT WEEKLY status (CWS, cols *_cws) — activity in the LAST 7 DAYS.
+      A shorter-memory snapshot used for some headline rates.
+  The status CODE (pas / sas / aps_cws) says employed-and-how vs not:
+  self-employed (11/12), unpaid family helper (21), regular salaried (31),
+  casual labour (41/42), and 8x/9x = unemployed / outside the labour force.
+
+  ── Each job is tagged with two independent classifications ──────────────
+    • INDUSTRY  (NIC, ind_* cols) = the employer's sector → plfs_dim_nic
+    • OCCUPATION(NCO, ocu_* cols) = what the person does    → plfs_dim_nco
+  e.g. a software developer (NCO group '251') at an IT firm (NIC div '62').
+
+  ── Weights are MANDATORY for any count / total / rate ───────────────────
+  PLFS surveys a SAMPLE, not everyone. Each row carries weight_annual = the
+  number of real people in India that record represents. So population-level
+  numbers MUST be weighted: SUM(weight_annual) for headcounts, weighted
+  quantiles for medians, etc. A raw COUNT(*) of rows is just a sample size
+  and is NOT a population estimate. (weight_annual is NULL for CY2021 — its
+  schema is partial and unweightable.)
+
+  Labels for the small common enums (sex, sector, marital_status, activity
+  status, …) are denormalized inline as *_label columns so you don't need a
+  lookup. The two big hierarchical lookups (NCO / NIC) live in their own dim
+  tables, plfs_dim_nco / plfs_dim_nic.
 clustering: [release_id, st]
 columns:
   # ── Release metadata ───────────────────────────────────────────────────
@@ -24,12 +56,12 @@ columns:
 
   # ── Household join key + survey design ─────────────────────────────────
   - { name: hh_id,          type: STRING, mode: REQUIRED,
-      description: "Stable 16-char SHA1 prefix of (release_id, qtr, month, visit, sec, st, dc, mfsu, sss, ssu). Joins to plfs.households.hh_id." }
+      description: "Stable 16-char SHA1 prefix of (release_id, qtr, month, visit, sec, st, dc, mfsu, sss, ssu). Joins to plfs_fact_households.hh_id." }
   - { name: srl_no,         type: STRING,
       description: "Person serial number within household." }
   - { name: qtr,             type: STRING, description: "Quarter code (annual / pre-CY2025 releases)." }
   - { name: month,           type: STRING, description: "Month code (CY2025; mutually exclusive with qtr)." }
-  - { name: visit,           type: STRING, description: "'V1' (first visit) or 'V2'/'V3'/'V4' (revisits)." }
+  - { name: visit,           type: STRING, description: "Survey visit. PLFS revisits the same household more than once in a year (a rotating panel); 'V1' = first visit, 'V2'/'V3'/'V4' = revisits. A person appears once per visit." }
   - { name: nss_reg,         type: STRING, description: "NSS region code." }
   - { name: strm,            type: STRING, description: "Stratum code (resets per state)." }
   - { name: sstrm,           type: STRING, description: "Sub-stratum code." }
@@ -42,9 +74,9 @@ columns:
   # ── Geography ──────────────────────────────────────────────────────────
   - { name: sec,         type: STRING, description: "Sector code. '1'=Rural, '2'=Urban." }
   - { name: sec_label,   type: STRING, description: "Denormalized: 'Rural' or 'Urban'." }
-  - { name: st,          type: STRING, description: "State/UT code (2-digit, zero-padded). Joins to plfs.dim_geo.state_code." }
+  - { name: st,          type: STRING, description: "State/UT code (2-digit, zero-padded). Joins to plfs_dim_geo.state_code." }
   - { name: state_name,  type: STRING, description: "Denormalized state name." }
-  - { name: dc,          type: STRING, description: "District code (2-digit, scoped to state). Use with st to join plfs.dim_geo." }
+  - { name: dc,          type: STRING, description: "District code (2-digit, scoped to state). Use with st to join plfs_dim_geo." }
 
   # ── Demographics ───────────────────────────────────────────────────────
   - { name: rel,         type: STRING, description: "Relation to household head code. '1' = head of household." }
@@ -56,9 +88,9 @@ columns:
   - { name: marst_label, type: STRING, description: "Denormalized marital status label." }
 
   # ── Education ──────────────────────────────────────────────────────────
-  - { name: gedu_lvl,    type: STRING, description: "General education level code. '12'=Graduate, '13'=Postgraduate, '10'=Higher Secondary, etc." }
+  - { name: gedu_lvl,    type: STRING, description: "GENERAL (academic) education — highest level of regular schooling/degree completed. '12'=Graduate, '13'=Postgraduate, '10'=Higher Secondary, etc." }
   - { name: gedu_label,  type: STRING, description: "Denormalized general education label." }
-  - { name: tedu_lvl,    type: STRING, description: "Technical education code. '03'/'13'=Engineering degree, '04'/'14'=Medical degree." }
+  - { name: tedu_lvl,    type: STRING, description: "TECHNICAL/professional qualification, recorded separately from general education. '03'/'13'=Engineering degree, '04'/'14'=Medical degree. (Used to identify engineering/medical grads — e.g. tedu_lvl IN ('03','13') = engineering degree-holders.)" }
   - { name: tedu_label,  type: STRING, description: "Denormalized technical education label." }
   - { name: voc,         type: STRING, description: "Vocational/technical training-received code." }
   - { name: voc_label,   type: STRING, description: "Denormalized vocational training label." }
@@ -66,9 +98,9 @@ columns:
   # ── Usual Principal Activity Status (Block 5.1) ────────────────────────
   - { name: pas,             type: STRING, description: "Usual principal activity status. '11'/'12' self-employed, '21' unpaid family, '31'=regular salaried, '41'/'42' casual, '51' didn't work but had work, '8x' unemployed, '9x' out of labour force." }
   - { name: pas_label,       type: STRING, description: "Denormalized PAS label." }
-  - { name: ind_pas,         type: STRING, description: "Industry (NIC 2008, 5-digit) in principal status. Joins to plfs.dim_nic.code_subclass." }
-  - { name: ind_pas_div,     type: STRING, description: "Derived: 2-digit prefix of ind_pas. '62'/'63' = IT services. Joins to plfs.dim_nic.code_division." }
-  - { name: ocu_pas,         type: STRING, description: "Occupation (NCO 2015, 3-digit) in principal status. Joins to plfs.dim_nco.code_group." }
+  - { name: ind_pas,         type: STRING, description: "Industry (NIC 2008, 5-digit) in principal status. Joins to plfs_dim_nic.code_subclass." }
+  - { name: ind_pas_div,     type: STRING, description: "Derived: 2-digit prefix of ind_pas. '62'/'63' = IT services. Joins to plfs_dim_nic.code_division." }
+  - { name: ocu_pas,         type: STRING, description: "Occupation (NCO 2015, 3-digit) in principal status. Joins to plfs_dim_nco.code_group." }
   - { name: etyp_pas,        type: STRING, description: "Enterprise type code in principal status." }
   - { name: etyp_pas_label,  type: STRING, description: "Denormalized enterprise type label." }
   - { name: ssec_pas,        type: STRING, description: "Social security benefits code in principal status." }
@@ -93,10 +125,13 @@ columns:
   - { name: ern_self,    type: INT64, description: "Monthly earnings (₹) for self-employment. Negative values allowed (losses)." }
 
   # ── Weight (raw inputs + calibrated output) ────────────────────────────
-  - { name: nss,         type: INT64, description: "FSUs surveyed in the cell for this sub-sample." }
-  - { name: nsc,         type: INT64, description: "FSUs surveyed in the cell combined across sub-samples." }
-  - { name: mult,        type: INT64, description: "Sub-sample-wise multiplier with 2 implied decimals. Kept raw for transparency." }
-  - { name: no_qtr,      type: INT64, description: "Count of contributing FSUs across quarters." }
+  # These four are the RAW survey-design inputs MoSPI ships; the loader
+  # combines them per the release's weight_rule into weight_annual. For
+  # analysis use weight_annual, not these.
+  - { name: nss,         type: INT64, description: "FSUs surveyed in the cell for this sub-sample (raw weight input)." }
+  - { name: nsc,         type: INT64, description: "FSUs surveyed in the cell combined across sub-samples (raw weight input)." }
+  - { name: mult,        type: INT64, description: "MoSPI's sub-sample-wise multiplier with 2 implied decimals. Kept raw for transparency (raw weight input)." }
+  - { name: no_qtr,      type: INT64, description: "Count of contributing FSUs across quarters (raw weight input)." }
   - name: weight_annual
     type: FLOAT64
     description: >

@@ -50,8 +50,9 @@ scale up to India-wide population estimates (~1.4B).
 
 ## 2. What this gets used for
 
-The kinds of questions this dataset answers, drawn from analyses already in
-[`analyses/`](analyses/):
+The kinds of questions this dataset answers (analysis intents now live in
+`bq-assistant/docs/analyses/external_data_sources.yaml`; the exploratory scripts
+run locally):
 
 - **Engineering jobs longitudinal** — engineering grads age 20-24 in regular
   salaried jobs paying ≥ ₹25k/month, year-by-year from 2018-19 to CY2025,
@@ -140,13 +141,13 @@ Total one-time cost: ~₹100. Extracted TSVs and original catalog URLs are in
                  │ scripts/load_bq.py  — one-shot ETL into BigQuery
                  ▼
         ┌─────────────────┐
-        │   BigQuery       │  6 tables in the `plfs` dataset:
-        │                  │    persons     (~10.5M rows, fact)
-        │                  │    households  (~2.5M rows, fact)
-        │                  │    releases    (11 rows, registry)
-        │                  │    dim_nco     (~2.7k, full occupation hierarchy)
-        │                  │    dim_nic     (~1.3k, full industry hierarchy)
-        │                  │    dim_geo     (~700, state + district)
+        │   BigQuery       │  6 tables in `avantifellows.external_data_sources`:
+        │                  │    plfs_fact_persons     (~10.5M rows, fact)
+        │                  │    plfs_fact_households  (~2.5M rows, fact)
+        │                  │    plfs_releases         (11 rows, registry)
+        │                  │    plfs_dim_nco          (~2.7k, occupation hierarchy)
+        │                  │    plfs_dim_nic          (~1.3k, industry hierarchy)
+        │                  │    plfs_dim_geo          (~700, state + district)
         └─────────────────┘
 ```
 
@@ -189,9 +190,7 @@ PLFS/
 │   ├── parse_nco_2015.py         ← writes codemaps/nco_*.csv from NCO PDF
 │   └── load_bq.py                ← one-shot ETL into BigQuery (6 tables)
 │
-├── schemas/                      ← BigQuery column-level docs (one YAML per table)
-│
-└── analyses/                     ← exploratory research scripts (read clean/* CSVs)
+└── schemas/                      ← BigQuery column-level docs (one YAML per table)
 ```
 
 ## 6. Quickstart
@@ -214,7 +213,7 @@ python3 scripts/parse_data.py calendar_2025
 python3 scripts/parse_data.py
 
 # Load everything into BigQuery (idempotent; ~5-10 min for full dataset)
-python3 scripts/load_bq.py                       # to dataset `plfs`
+python3 scripts/load_bq.py                       # to dataset `external_data_sources`
 python3 scripts/load_bq.py --dataset plfs_dev    # to a dev dataset
 python3 scripts/load_bq.py --release calendar_2025  # one release only
 python3 scripts/load_bq.py --dims-only           # just dims + registry
@@ -285,17 +284,17 @@ Per-release `weight_rule` is recorded in [`clean/releases.csv`](clean/releases.c
 
 ## 11. BigQuery
 
-Six tables in the `plfs` dataset, populated by
+Six tables in `avantifellows.external_data_sources` (plfs_*-prefixed), populated by
 [`scripts/load_bq.py`](scripts/load_bq.py):
 
 | Table | Rows | Notes |
 |---|---:|---|
-| `plfs.persons` | ~10.5M | All releases unioned. `weight_annual` pre-computed. `hh_id` joins to households. `ind_pas_div` (2-digit NIC prefix) and `*_label` columns for the common enums are denormalized inline. |
-| `plfs.households` | ~2.5M | `weight_annual`, `hh_id`, and `mpce = hce_tot/hh_size` pre-computed. |
-| `plfs.releases` | 11 | Registry: catalog IDs, URLs, weight rules, period bounds. |
-| `plfs.dim_nco` | ~2.7k | Full NCO 2015 occupation hierarchy in one wide table (division → subdivision → group → family → full). |
-| `plfs.dim_nic` | ~1.3k | Full NIC 2008 industry hierarchy in one wide table (division → group → class → subclass). |
-| `plfs.dim_geo` | ~700 | State + district. (State name is also inline on the facts.) |
+| `plfs_fact_persons` | ~10.5M | All releases unioned. `weight_annual` pre-computed. `hh_id` joins to households. `ind_pas_div` (2-digit NIC prefix) and `*_label` columns for the common enums are denormalized inline. |
+| `plfs_fact_households` | ~2.5M | `weight_annual`, `hh_id`, and `mpce = hce_tot/hh_size` pre-computed. |
+| `plfs_releases` | 11 | Registry: catalog IDs, URLs, weight rules, period bounds. |
+| `plfs_dim_nco` | ~2.7k | Full NCO 2015 occupation hierarchy in one wide table (division → subdivision → group → family → full). |
+| `plfs_dim_nic` | ~1.3k | Full NIC 2008 industry hierarchy in one wide table (division → group → class → subclass). |
+| `plfs_dim_geo` | ~700 | State + district. (State name is also inline on the facts.) |
 
 Labels for the small enums (sex, sector, religion, marital_status, education
 levels, activity_status, enterprise_type, social_security, job_contract, etc.)
@@ -309,7 +308,7 @@ Typical query:
 SELECT release_year,
        SUM(weight_annual) / 1e6 AS engg_grads_millions,
        APPROX_QUANTILES(ern_reg, 100)[OFFSET(50)] AS median_wage
-FROM plfs.persons
+FROM `avantifellows.external_data_sources`.plfs_fact_persons
 WHERE tedu_lvl IN ('03','13')   -- engineering degree
   AND age BETWEEN 20 AND 24
   AND pas = '31'                -- regular salaried
@@ -319,6 +318,31 @@ GROUP BY release_year ORDER BY release_year;
 The load script is idempotent (`WRITE_TRUNCATE`), reproducible, and runs in
 ~5-10 minutes for the full 10.5M-row dataset. Re-run whenever a new PLFS
 release lands.
+
+## 12. GCS staging (parquet — BigQuery later, post-approval)
+
+To fit the `external_data_sources` model (raw in GCS → joined parquets → BQ once
+reviewed), [`scripts/upload_to_gcs.py`](scripts/upload_to_gcs.py) stages two
+things under `gs://avantifellows-external-data/plfs/`:
+
+- **`raw/`** — the per-release unit-level microdata (rsync of the local `raw/`
+  tree). PLFS raw is gated behind microdata.gov.in, so there is **no `fetch.py`**;
+  this GCS copy is the regenerable source of record.
+- **`clean/`** — the six joined tables as parquet, built by `load_bq.py --dry-run`
+  (which unions all 11 releases into `/tmp/plfs_bq`), uploaded with source-prefixed
+  names that map 1:1 to the eventual BQ tables: `plfs_fact_persons`,
+  `plfs_fact_households`, `plfs_dim_nco` / `nic` / `geo`, `plfs_releases`.
+
+```bash
+python3 scripts/load_bq.py --dry-run                          # joined parquets → /tmp/plfs_bq
+python3 scripts/upload_to_gcs.py --raw-dir <raw> --parquet-dir /tmp/plfs_bq
+#   --raw-only / --clean-only / --dry-run
+```
+
+The BQ load is deferred to post-approval. When it runs it can use the dataframe
+loader above (point `--dataset external_data_sources`, table names gain the
+`plfs_` prefix) or be switched to load the staged parquets from GCS via
+`load_table_from_uri`.
 
 ## Status
 

@@ -1,0 +1,58 @@
+table: avantifellows.external_data_sources.plfs_dim_nic
+description: |
+  ── What NIC is ──────────────────────────────────────────────────────────
+  NIC = National Industrial Classification. It is India's official scheme
+  for classifying an economic unit by the KIND OF ACTIVITY IT CARRIES OUT —
+  i.e. what the employing business/establishment produces or does (farming,
+  textile manufacturing, software, banking, …). NIC is India's adaptation
+  of the UN's ISIC. In PLFS, every working person is tagged with the NIC
+  code of the enterprise they work in, so NIC answers "what INDUSTRY /
+  SECTOR does this person work in?".
+
+  (Contrast NCO — National Classification of Occupations, in plfs_dim_nco —
+  which classifies the kind of WORK the person personally does, regardless
+  of the employer's industry. A software developer (NCO) may work at a bank
+  (NIC = financial services) or at an IT firm (NIC = '62'). NIC = where they
+  work; NCO = what they do.)
+
+  This table is the full NIC 2008 hierarchy (the current vintage) in one
+  wide table — ~1,300 rows. Each row is one most-detailed 5-digit industry
+  with all three parent levels denormalized onto the same row.
+
+  ── How the hierarchy works ──────────────────────────────────────────────
+  NIC is a nested numeric code that gets more specific as digits are added,
+  broad sector → exact activity:
+
+    division   (2-digit)  broadest sector          e.g. '62' = Computer
+                                                    programming, consultancy
+                                                    & related activities
+      group    (3-digit)  a slice of the division  e.g. '620'
+        class  (4-digit)  a slice of the group     e.g. '6201' = Computer
+                                                    programming activities
+       subclass(5-digit)  most detailed activity   e.g. '62011'
+
+  Each level is a literal PREFIX of the next (division = first 2 digits of
+  the subclass, group = first 3, …), so you can roll a 5-digit code up to
+  any broader level just by truncating digits — or use the pre-denormalized
+  parent columns on each row.
+
+  Joins:
+    - plfs_fact_persons.ind_pas       → code_subclass (5-digit, principal activity)
+    - plfs_fact_persons.ind_pas_div   → code_division (2-digit; pre-derived prefix)
+    - plfs_fact_persons.ind_sas       → code_subclass (5-digit, subsidiary)
+    - plfs_fact_persons.aind_cws      → code_division (2-digit, CWS)
+
+  Note: divisions '62' (Computer programming / consultancy) and '63'
+  (Information service activities) together are the standard "IT services"
+  filter used in several analyses (e.g. the IT-jobs / women-in-IT work).
+columns:
+  - { name: code_subclass,    type: STRING, mode: REQUIRED,
+      description: "Most-detailed 5-digit industry code (the leaf level), e.g. '62011' = Computer programming activities. Join target for persons.ind_pas / ind_sas." }
+  - { name: label_subclass,   type: STRING, mode: REQUIRED,
+      description: "Plain-text name of the 5-digit subclass." }
+  - { name: code_class,       type: STRING, description: "4-digit class code (subclass with last digit dropped), e.g. '6201'." }
+  - { name: label_class,      type: STRING, description: "Plain-text name of the 4-digit class." }
+  - { name: code_group,       type: STRING, description: "3-digit group code (first 3 digits of the subclass), e.g. '620'." }
+  - { name: label_group,      type: STRING, description: "Plain-text name of the 3-digit group." }
+  - { name: code_division,    type: STRING, description: "Broadest 2-digit sector code (first 2 digits of the subclass), e.g. '62' = Computer programming, consultancy and related activities. Join target for persons.ind_pas_div / aind_cws." }
+  - { name: label_division,   type: STRING, description: "Plain-text name of the 2-digit division (the broad sector)." }

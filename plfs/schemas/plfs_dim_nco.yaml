@@ -1,0 +1,56 @@
+table: avantifellows.external_data_sources.plfs_dim_nco
+description: |
+  ── What NCO is ──────────────────────────────────────────────────────────
+  NCO = National Classification of Occupations. It is India's official scheme
+  for classifying a person by the KIND OF WORK / JOB THEY PERSONALLY DO
+  (their role: software developer, shop salesperson, nurse, mason, …),
+  independent of the industry they do it in. NCO is India's adaptation of
+  the ILO's ISCO. In PLFS, every working person carries the NCO code of
+  their own job, so NCO answers "what does this person DO?".
+
+  (Contrast NIC — National Industrial Classification, in plfs_dim_nic —
+  which classifies the employer's industry/sector. NCO = what they do;
+  NIC = where/in-what-sector they do it. The same NCO occupation can appear
+  across many NIC industries.)
+
+  This table is the full NCO 2015 hierarchy (the current vintage) in one
+  wide table — ~2,700 rows. Each row is one most-detailed 8-digit occupation
+  with all four parent levels denormalized onto the same row.
+
+  ── How the hierarchy works ──────────────────────────────────────────────
+  NCO is a nested numeric code, broad skill-grouping → exact occupation:
+
+    division     (1-digit)  10 broad groups        e.g. '2' = Professionals,
+                                                    '5' = Service & Sales,
+                                                    '4' = Clerks, '9' =
+                                                    Elementary occupations
+      subdivision(2-digit)  a slice of the division e.g. '25'
+        group    (3-digit)  THE LEVEL ANALYSTS      e.g. '251' = Software &
+                            USUALLY FILTER ON        applications developers;
+                                                    '522' = shop salespersons;
+                                                    '411' = general clerks
+          family (4-digit)  a slice of the group    e.g. '2512'
+            full (8-digit)  most detailed occupation e.g. '2512.0100'
+
+  Each higher level is a prefix of the next (group = first 3 digits of the
+  family, etc.; code_family = code_full[:4] with the '.' stripped), so codes
+  roll up by truncating — or use the pre-denormalized parent columns.
+
+  Joins (PLFS stores occupation at the 3-digit GROUP level):
+    - plfs_fact_persons.ocu_pas  → code_group       (3-digit, in principal activity)
+    - plfs_fact_persons.ocu_sas  → code_group       (3-digit, in subsidiary activity)
+    - plfs_fact_persons.ocu_cws  → code_group       (3-digit, in CWS)
+columns:
+  - { name: code_full,         type: STRING, mode: REQUIRED,
+      description: "Most-detailed 8-digit NCO 2015 code (the leaf level) with '.' separator, e.g. '2512.0100'." }
+  - { name: label_full,        type: STRING, mode: REQUIRED,
+      description: "Plain-text occupation title at the most-detailed 8-digit level." }
+  - { name: code_family,       type: STRING, description: "4-digit family code (first 4 digits of code_full), e.g. '2512'." }
+  - { name: label_family,      type: STRING, description: "Plain-text name of the 4-digit family." }
+  - { name: code_group,        type: STRING, description: "3-digit group code, e.g. '251'. This is the level PLFS records occupation at and the level analysts most often filter on (join target for persons.ocu_*)." }
+  - { name: label_group,       type: STRING, description: "Plain-text name of the 3-digit group, e.g. 'Software and Applications Developers and Analysts'." }
+  - { name: code_subdivision,  type: STRING, description: "2-digit subdivision code (first 2 digits of the group), e.g. '25'." }
+  - { name: label_subdivision, type: STRING, description: "Plain-text name of the 2-digit subdivision." }
+  - { name: code_division,     type: STRING, description: "Broadest 1-digit division code. '2'=Professionals, '5'=Service/Sales Workers, '4'=Clerks, '9'=Elementary occupations, etc." }
+  - { name: label_division,    type: STRING, description: "Plain-text name of the 1-digit division (the broad occupational group)." }
+  - { name: nco_2004_code,     type: STRING, description: "Equivalent code in the older NCO 2004 vintage (e.g. '2132.10'), for cross-walking against datasets coded to NCO 2004." }
