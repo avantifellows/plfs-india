@@ -33,11 +33,9 @@ codemaps/*.csv           (committed — small lookup tables)
         │
         │  scripts/load_bq.py
         ▼
-BigQuery `plfs` dataset  (6 tables — see "BQ schema" below)
-        │
-        ▼
-analyses/*.py            (exploratory research scripts; today read CSVs, will move to BQ)
+BigQuery `avantifellows.external_data_sources`  (6 plfs_* tables — see "BQ schema" below)
 ```
+Analysis runs outside this repo (intents in bq-assistant; scripts local).
 
 **Single source of truth: [`scripts/releases.py`](scripts/releases.py).** The
 `RELEASES` dict holds catalog IDs, URLs, weight rules, file formats, byte
@@ -153,12 +151,13 @@ Six tables in the `plfs` dataset. Authoritative column-level docs in
 - `codemaps/*.csv` — small lookup tables (state, district, NCO/NIC by level,
   the trivial enums). Committed. Read by `load_bq.py` to build dim tables and
   to denormalize labels onto facts.
-- `analyses/` — exploratory Python research. Currently reads `clean/*.csv`
-  directly. Will move to BQ SQL once the loader is run end-to-end.
+- Analysis code is NOT committed here — it runs locally / via the bq-assistant
+  repo. The analysis intents live in
+  `bq-assistant/docs/analyses/external_data_sources.yaml`.
 
 ## Analyses worth understanding before touching the schema
 
-All under `analyses/`. They define what the data is actually used for:
+These run outside this repo (intents in bq-assistant). They define what the data is used for:
 
 - Engineering grads in regular salaried roles, longitudinal by wage tier
 - Women's share of entry-level IT jobs (filters on NIC `62`/`63`)

@@ -50,8 +50,9 @@ scale up to India-wide population estimates (~1.4B).
 
 ## 2. What this gets used for
 
-The kinds of questions this dataset answers, drawn from analyses already in
-[`analyses/`](analyses/):
+The kinds of questions this dataset answers (analysis intents now live in
+`bq-assistant/docs/analyses/external_data_sources.yaml`; the exploratory scripts
+run locally):
 
 - **Engineering jobs longitudinal** — engineering grads age 20-24 in regular
   salaried jobs paying ≥ ₹25k/month, year-by-year from 2018-19 to CY2025,
@@ -189,9 +190,7 @@ PLFS/
 │   ├── parse_nco_2015.py         ← writes codemaps/nco_*.csv from NCO PDF
 │   └── load_bq.py                ← one-shot ETL into BigQuery (6 tables)
 │
-├── schemas/                      ← BigQuery column-level docs (one YAML per table)
-│
-└── analyses/                     ← exploratory research scripts (read clean/* CSVs)
+└── schemas/                      ← BigQuery column-level docs (one YAML per table)
 ```
 
 ## 6. Quickstart
