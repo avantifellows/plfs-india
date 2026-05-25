@@ -6,8 +6,8 @@ CODEMAP = {
     },
     "constants": {
         "test_year": "2026",
-        "test_name": "JEE Mains Overall",
-        "max_score": 300,
+        "test_name": "JEE",
+        "mains_max_score": 300,
         "jee_adv_ineligible": False,
     },
     # 2026 eligible notes:
@@ -33,11 +33,11 @@ CODEMAP = {
         "year_of_passing_12":       ["yearOfPassing.1"],
         "marks_12_obtained":        ["obtainedMark.1"],
         "marks_12_total":           ["totalMark.1"],
-        "appeared_for_exam":        ["PS_TOT_P1F"],
-        "physics_score":            ["PS_PHY_P1F"],
-        "chemistry_score":          ["PS_CHE_P1F"],
-        "maths_score":              ["PS_MAT_P1F"],
-        "total_score":              ["PS_TOT_P1F"],
+        "mains_appeared_for_exam":        ["PS_TOT_P1F"],
+        "mains_physics_score":            ["PS_PHY_P1F"],
+        "mains_chemistry_score":          ["PS_CHE_P1F"],
+        "mains_maths_score":              ["PS_MAT_P1F"],
+        "mains_total_score":              ["PS_TOT_P1F"],
         "jee_mains_qualified":      ["REMARK"],
     },
 }
