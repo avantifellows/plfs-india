@@ -60,6 +60,11 @@ EI_ASSET_TEST_CLEAN = Table(
     local_path=JNV_DIR / "clean" / "ei_asset_test_clean.csv",
 )
 
+BOARD_RESULTS_10TH_CLEAN = Table(
+    name="jnv_fact_board_results_10th",
+    local_path=JNV_DIR / "clean" / "board_results_10th_clean.csv",
+)
+
 # ── Raw file definitions (Excel → parquet on GCS) ─────────────────────────────
 
 @dataclass
@@ -108,6 +113,25 @@ RAW_JNVST_FILES = [
 
 RAW_EI_ASSET_TEST_FILES = [
     RawFile("EI_Asset_Test.xlsx", "student_scores", subdir="ei_asset_test"),
+]
+
+RAW_BOARD_RESULTS_10TH_FILES = [
+    RawFile("JNV1022.xlsx", "jnv1022",   subdir="board_results_10th"),
+    RawFile("JNV1023.xlsx", "JNV1023",   subdir="board_results_10th"),
+    RawFile("JNV1024.xlsx", "jnv_1024",  subdir="board_results_10th"),
+    RawFile("JNV1025.xlsx", "Sheet1",    subdir="board_results_10th"),
+]
+
+BOARD_RESULTS_12TH_CLEAN = Table(
+    name="jnv_fact_board_results_12th",
+    local_path=JNV_DIR / "clean" / "board_results_12th_clean.csv",
+)
+
+RAW_BOARD_RESULTS_12TH_FILES = [
+    RawFile("JNV1222.xlsx", "jnv1222",    subdir="board_results_12th"),
+    RawFile("JNV1223.xlsx", "jnv1223",    subdir="board_results_12th"),
+    RawFile("JNV1224.xlsx", "jnv1224",    subdir="board_results_12th"),
+    RawFile("JNV1225.xlsx", "Main Data",  subdir="board_results_12th"),
 ]
 
 # Legacy alias kept so upload_to_gcs.py and load_bq.py continue to work

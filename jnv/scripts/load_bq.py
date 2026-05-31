@@ -22,7 +22,7 @@ import argparse
 
 from google.cloud import bigquery
 
-from sources import BQ_LOCATION, BQ_PROJECT, EI_ASSET_TEST_CLEAN, JEE_CLEAN, JNVST_CLEAN, NEET_CLEAN
+from sources import BOARD_RESULTS_10TH_CLEAN, BOARD_RESULTS_12TH_CLEAN, BQ_LOCATION, BQ_PROJECT, EI_ASSET_TEST_CLEAN, JEE_CLEAN, JNVST_CLEAN, NEET_CLEAN
 
 
 def _load(client: bigquery.Client, table) -> None:
@@ -49,7 +49,9 @@ def main() -> None:
     group.add_argument("--jee-only",   action="store_true")
     group.add_argument("--neet-only",  action="store_true")
     group.add_argument("--jnvst-only",         action="store_true")
-    group.add_argument("--ei-asset-test-only", action="store_true")
+    group.add_argument("--ei-asset-test-only",       action="store_true")
+    group.add_argument("--board-results-10th-only",  action="store_true")
+    group.add_argument("--board-results-12th-only",  action="store_true")
     args = parser.parse_args()
 
     client = bigquery.Client(project=BQ_PROJECT, location=BQ_LOCATION)
@@ -62,6 +64,10 @@ def main() -> None:
         _load(client, JNVST_CLEAN)
     elif args.ei_asset_test_only:
         _load(client, EI_ASSET_TEST_CLEAN)
+    elif args.board_results_10th_only:
+        _load(client, BOARD_RESULTS_10TH_CLEAN)
+    elif args.board_results_12th_only:
+        _load(client, BOARD_RESULTS_12TH_CLEAN)
     else:
         _load(client, JEE_CLEAN)
         _load(client, NEET_CLEAN)

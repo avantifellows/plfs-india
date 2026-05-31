@@ -34,7 +34,7 @@ from pathlib import Path
 import pandas as pd
 from google.cloud import storage
 
-from sources import EI_ASSET_TEST_CLEAN, GCS_BUCKET, JEE_CLEAN, JNVST_CLEAN, NEET_CLEAN, RAW_ADV_FILES, RAW_EI_ASSET_TEST_FILES, RAW_JNVST_FILES, RAW_MAINS_FILES, RAW_NEET_FILES
+from sources import BOARD_RESULTS_10TH_CLEAN, BOARD_RESULTS_12TH_CLEAN, EI_ASSET_TEST_CLEAN, GCS_BUCKET, JEE_CLEAN, JNVST_CLEAN, NEET_CLEAN, RAW_ADV_FILES, RAW_BOARD_RESULTS_10TH_FILES, RAW_BOARD_RESULTS_12TH_FILES, RAW_EI_ASSET_TEST_FILES, RAW_JNVST_FILES, RAW_MAINS_FILES, RAW_NEET_FILES
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from codemaps.ei_asset_test.shared import apply_dtypes as apply_dtypes_ei_asset_test
@@ -79,7 +79,9 @@ def main() -> None:
     group.add_argument("--jee-only",   action="store_true", help="Upload JEE raw + clean")
     group.add_argument("--neet-only",  action="store_true", help="Upload NEET raw + clean")
     group.add_argument("--jnvst-only",         action="store_true", help="Upload JNVST raw + clean")
-    group.add_argument("--ei-asset-test-only", action="store_true", help="Upload EI Asset Test raw + clean")
+    group.add_argument("--ei-asset-test-only",       action="store_true", help="Upload EI Asset Test raw + clean")
+    group.add_argument("--board-results-10th-only",  action="store_true", help="Upload 10th board results raw + clean")
+    group.add_argument("--board-results-12th-only",  action="store_true", help="Upload 12th board results raw + clean")
     args = parser.parse_args()
 
     client = storage.Client()
@@ -104,6 +106,12 @@ def main() -> None:
     elif args.ei_asset_test_only:
         _upload_raw_files(client, RAW_EI_ASSET_TEST_FILES, "EI Asset Test")
         _upload_clean_table(client, EI_ASSET_TEST_CLEAN, apply_dtypes_ei_asset_test, "clean_ei_asset_test.py")
+    elif args.board_results_10th_only:
+        _upload_raw_files(client, RAW_BOARD_RESULTS_10TH_FILES, "10th board results")
+        _upload_clean_table(client, BOARD_RESULTS_10TH_CLEAN, None, "clean_board_results_10th.py")
+    elif args.board_results_12th_only:
+        _upload_raw_files(client, RAW_BOARD_RESULTS_12TH_FILES, "12th board results")
+        _upload_clean_table(client, BOARD_RESULTS_12TH_CLEAN, None, "clean_board_results_12th.py")
     else:
         _upload_raw_files(client, RAW_MAINS_FILES, "mains")
         _upload_raw_files(client, RAW_ADV_FILES, "advanced")
